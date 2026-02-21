@@ -1,12 +1,14 @@
 import { ConvexAdapter } from "@/app/ConvexAdapter";
 import { SignJWT, importPKCS8 } from "jose";
 import NextAuth from "next-auth";
+import Credentials from "next-auth/providers/credentials";
+import Google from "next-auth/providers/google";
 const CONVEX_SITE_URL = process.env.NEXT_PUBLIC_CONVEX_URL!.replace(
   /.cloud$/,
   ".site",
 );
 export const { handlers, signIn, signOut, auth } = NextAuth({
-  providers: [],
+  providers: [Google],
   adapter: ConvexAdapter,
   callbacks: {
     async session({ session }) {

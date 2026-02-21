@@ -30,7 +30,7 @@ export const ConvexAdapter: Adapter = {
     return { ...session, id };
   },
   async createUser({ id: _, ...user }: User) {
-    const id = await callMutation(api.user.mutations.createUser, {
+    const id = await callMutation(api.auth.user.mutations.createUser, {
       user: toDB(user),
     });
     return { ...user, id };
@@ -50,7 +50,7 @@ export const ConvexAdapter: Adapter = {
   },
   async deleteUser(id: Id<"users">) {
     return maybeUserFromDB(
-      await callMutation(api.user.mutations.deleteUser, { id }),
+      await callMutation(api.auth.user.mutations.deleteUser, { id }),
     );
   },
   async getAccount(providerAccountId, provider) {
@@ -73,11 +73,11 @@ export const ConvexAdapter: Adapter = {
     return { user: userFromDB(user), session: sessionFromDB(session) };
   },
   async getUser(id: Id<"users">) {
-    return maybeUserFromDB(await callQuery(api.user.queries.getUser, { id }));
+    return maybeUserFromDB(await callQuery(api.auth.user.queries.getUser, { id }));
   },
   async getUserByAccount({ provider, providerAccountId }) {
     return maybeUserFromDB(
-      await callQuery(api.user.queries.getUserByAccount, {
+      await callQuery(api.auth.user.queries.getUserByAccount, {
         provider,
         providerAccountId,
       }),
@@ -85,7 +85,7 @@ export const ConvexAdapter: Adapter = {
   },
   async getUserByEmail(email) {
     return maybeUserFromDB(
-      await callQuery(api.user.queries.getUserByEmail, { email }),
+      await callQuery(api.auth.user.queries.getUserByEmail, { email }),
     );
   },
   async linkAccount(account: Account) {
@@ -116,7 +116,7 @@ export const ConvexAdapter: Adapter = {
     });
   },
   async updateUser(user: User) {
-    await callMutation(api.user.mutations.updateUser, { user: toDB(user) });
+    await callMutation(api.auth.user.mutations.updateUser, { user: toDB(user) });
     return user;
   },
   async useVerificationToken({ identifier, token }) {

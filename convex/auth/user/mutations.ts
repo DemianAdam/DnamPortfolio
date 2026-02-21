@@ -1,6 +1,6 @@
 import z from "zod";
-import { adapterMutation } from "../auth/adapter";
-import { userValidator } from "./validators";
+import { adapterMutation } from "../adapter";
+import { userValidator } from "../../user/validators";
 import { zid } from "convex-helpers/server/zod4";
 
 export const createUser = adapterMutation({

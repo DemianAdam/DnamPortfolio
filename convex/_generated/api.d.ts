@@ -8,6 +8,7 @@
  * @module
  */
 
+import type * as auth_account_helpers from "../auth/account/helpers.js";
 import type * as auth_account_mutations from "../auth/account/mutations.js";
 import type * as auth_account_queries from "../auth/account/queries.js";
 import type * as auth_account_validators from "../auth/account/validators.js";
@@ -18,10 +19,12 @@ import type * as auth_authenticator_queries from "../auth/authenticator/queries.
 import type * as auth_session_mutations from "../auth/session/mutations.js";
 import type * as auth_session_queries from "../auth/session/queries.js";
 import type * as auth_session_validators from "../auth/session/validators.js";
+import type * as auth_user_mutations from "../auth/user/mutations.js";
+import type * as auth_user_queries from "../auth/user/queries.js";
 import type * as auth_verificationToken_mutations from "../auth/verificationToken/mutations.js";
 import type * as auth_verificationToken_validators from "../auth/verificationToken/validators.js";
-import type * as user_mutations from "../user/mutations.js";
-import type * as user_queries from "../user/queries.js";
+import type * as http from "../http.js";
+import type * as user_roles from "../user/roles.js";
 import type * as user_validators from "../user/validators.js";
 import type * as zod_zod from "../zod/zod.js";
 
@@ -32,6 +35,7 @@ import type {
 } from "convex/server";
 
 declare const fullApi: ApiFromModules<{
+  "auth/account/helpers": typeof auth_account_helpers;
   "auth/account/mutations": typeof auth_account_mutations;
   "auth/account/queries": typeof auth_account_queries;
   "auth/account/validators": typeof auth_account_validators;
@@ -42,10 +46,12 @@ declare const fullApi: ApiFromModules<{
   "auth/session/mutations": typeof auth_session_mutations;
   "auth/session/queries": typeof auth_session_queries;
   "auth/session/validators": typeof auth_session_validators;
+  "auth/user/mutations": typeof auth_user_mutations;
+  "auth/user/queries": typeof auth_user_queries;
   "auth/verificationToken/mutations": typeof auth_verificationToken_mutations;
   "auth/verificationToken/validators": typeof auth_verificationToken_validators;
-  "user/mutations": typeof user_mutations;
-  "user/queries": typeof user_queries;
+  http: typeof http;
+  "user/roles": typeof user_roles;
   "user/validators": typeof user_validators;
   "zod/zod": typeof zod_zod;
 }>;
