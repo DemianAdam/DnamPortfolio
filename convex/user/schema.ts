@@ -6,4 +6,5 @@ const userSchema = zodOutputToConvex(userValidator);
 
 export const userTable =
   defineTable(userSchema)
-    .index("email", ["email"]);
+    .index("email", ["email"])
+    .index("index_byRole", ["role"]);

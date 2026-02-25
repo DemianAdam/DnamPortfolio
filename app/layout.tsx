@@ -1,16 +1,16 @@
 import type { Metadata } from "next";
-import { Geist, Geist_Mono } from "next/font/google";
-import "./globals.css";
+import { Inter_Tight, Geist_Mono } from "next/font/google";import "./globals.css";
 import { auth } from "@/auth";
 import ConvexClientProvider from "./ConvexProviderWithAuth";
 
-const geistSans = Geist({
-  variable: "--font-geist-sans",
+const inter = Inter_Tight({
+  variable: "--font-sans",
   subsets: ["latin"],
+  display: "swap",
 });
 
 const geistMono = Geist_Mono({
-  variable: "--font-geist-mono",
+  variable: "--font-mono",
   subsets: ["latin"],
 });
 
@@ -27,9 +27,7 @@ export default async function RootLayout({
   const session = await auth();
   return (
     <html lang="en">
-      <body
-        className={`${geistSans.variable} ${geistMono.variable} antialiased`}
-      >
+      <body className={`${inter.variable} ${geistMono.variable} antialiased`}>
         <ConvexClientProvider session={session}>
           {children}
         </ConvexClientProvider>

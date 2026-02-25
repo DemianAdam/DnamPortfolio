@@ -8,6 +8,7 @@
  * @module
  */
 
+import type * as accessCode_validator from "../accessCode/validator.js";
 import type * as auth_account_helpers from "../auth/account/helpers.js";
 import type * as auth_account_mutations from "../auth/account/mutations.js";
 import type * as auth_account_queries from "../auth/account/queries.js";
@@ -23,9 +24,15 @@ import type * as auth_user_mutations from "../auth/user/mutations.js";
 import type * as auth_user_queries from "../auth/user/queries.js";
 import type * as auth_verificationToken_mutations from "../auth/verificationToken/mutations.js";
 import type * as auth_verificationToken_validators from "../auth/verificationToken/validators.js";
+import type * as counter from "../counter.js";
 import type * as http from "../http.js";
+import type * as triggers from "../triggers.js";
 import type * as user_roles from "../user/roles.js";
 import type * as user_validators from "../user/validators.js";
+import type * as videoAccess_validator from "../videoAccess/validator.js";
+import type * as video_mutations from "../video/mutations.js";
+import type * as video_triggers from "../video/triggers.js";
+import type * as video_validator from "../video/validator.js";
 import type * as zod_zod from "../zod/zod.js";
 
 import type {
@@ -35,6 +42,7 @@ import type {
 } from "convex/server";
 
 declare const fullApi: ApiFromModules<{
+  "accessCode/validator": typeof accessCode_validator;
   "auth/account/helpers": typeof auth_account_helpers;
   "auth/account/mutations": typeof auth_account_mutations;
   "auth/account/queries": typeof auth_account_queries;
@@ -50,9 +58,15 @@ declare const fullApi: ApiFromModules<{
   "auth/user/queries": typeof auth_user_queries;
   "auth/verificationToken/mutations": typeof auth_verificationToken_mutations;
   "auth/verificationToken/validators": typeof auth_verificationToken_validators;
+  counter: typeof counter;
   http: typeof http;
+  triggers: typeof triggers;
   "user/roles": typeof user_roles;
   "user/validators": typeof user_validators;
+  "videoAccess/validator": typeof videoAccess_validator;
+  "video/mutations": typeof video_mutations;
+  "video/triggers": typeof video_triggers;
+  "video/validator": typeof video_validator;
   "zod/zod": typeof zod_zod;
 }>;
 
@@ -82,4 +96,29 @@ export declare const internal: FilterApi<
   FunctionReference<any, "internal">
 >;
 
-export declare const components: {};
+export declare const components: {
+  shardedCounter: {
+    public: {
+      add: FunctionReference<
+        "mutation",
+        "internal",
+        { count: number; name: string; shard?: number; shards?: number },
+        number
+      >;
+      count: FunctionReference<"query", "internal", { name: string }, number>;
+      estimateCount: FunctionReference<
+        "query",
+        "internal",
+        { name: string; readFromShards?: number; shards?: number },
+        any
+      >;
+      rebalance: FunctionReference<
+        "mutation",
+        "internal",
+        { name: string; shards?: number },
+        any
+      >;
+      reset: FunctionReference<"mutation", "internal", { name: string }, any>;
+    };
+  };
+};

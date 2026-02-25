@@ -1,8 +1,10 @@
 import { ConvexAdapter } from "@/app/ConvexAdapter";
+import { fetchQuery } from "convex/nextjs";
 import { SignJWT, importPKCS8 } from "jose";
 import NextAuth from "next-auth";
-import Credentials from "next-auth/providers/credentials";
 import Google from "next-auth/providers/google";
+import { api } from "./convex/_generated/api";
+import { Role } from "./convex/user/roles";
 const CONVEX_SITE_URL = process.env.NEXT_PUBLIC_CONVEX_URL!.replace(
   /.cloud$/,
   ".site",
@@ -25,7 +27,13 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
         .setAudience("convex")
         .setExpirationTime("1h")
         .sign(privateKey);
-      return { ...session, convexToken };
+
+      const user = await fetchQuery(api.auth.user.queries.getUser, {
+        id: session.userId,
+        secret: process.env.CONVEX_AUTH_ADAPTER_SECRET!
+      })
+
+      return { ...session, convexToken, role: user?.role };
     },
   },
 });
@@ -33,5 +41,6 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
 declare module "next-auth" {
   interface Session {
     convexToken: string;
+    role: Role
   }
 }
