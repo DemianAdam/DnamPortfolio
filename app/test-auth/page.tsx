@@ -14,6 +14,27 @@ export default function TestAuthPage() {
       ) : (
         <button onClick={() => signOut()}>Logout</button>
       )}
+      {
+        !session ? (
+          resendForm
+        ) : (
+          <button onClick={() => signOut()}>Logout</button>
+        )
+      }
     </div>
   );
 }
+const resendAction = (formData: FormData) => {
+
+  signIn("resend", {
+    email: formData.get("email")
+  })
+}
+const resendForm =
+  <form action={resendAction}>
+    <label htmlFor="email">
+      Email
+      <input type="email" id="email" name="email" />
+    </label>
+    <input type="submit" value="Signin with" />
+  </form>

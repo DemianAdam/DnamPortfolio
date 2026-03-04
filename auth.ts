@@ -5,15 +5,21 @@ import NextAuth from "next-auth";
 import Google from "next-auth/providers/google";
 import { api } from "./convex/_generated/api";
 import { Role } from "./convex/user/roles";
+import Resend from "next-auth/providers/resend";
 const CONVEX_SITE_URL = process.env.NEXT_PUBLIC_CONVEX_URL!.replace(
   /.cloud$/,
   ".site",
 );
 export const { handlers, signIn, signOut, auth } = NextAuth({
-  providers: [Google],
+  providers: [Google({
+    allowDangerousEmailAccountLinking: true,
+  }), Resend({
+    apiKey: process.env.AUTH_RESEND_KEY!,
+    from: "onboarding@resend.dev"
+  })],
   adapter: ConvexAdapter,
   callbacks: {
-    async session({ session }) {
+    async session({ session, user }) {
       const privateKey = await importPKCS8(
         process.env.CONVEX_AUTH_PRIVATE_KEY!,
         "RS256",
@@ -28,14 +34,25 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
         .setExpirationTime("1h")
         .sign(privateKey);
 
-      const user = await fetchQuery(api.auth.user.queries.getUser, {
-        id: session.userId,
-        secret: process.env.CONVEX_AUTH_ADAPTER_SECRET!
-      })
-
-      return { ...session, convexToken, role: user?.role };
+      session.role = user.role
+      return { ...session, convexToken };
     },
+
+    async redirect({ url, baseUrl }) {
+      console.log("Redirecting to:", url);
+      console.log("Base URL:", baseUrl);
+      return url;
+    }
+
   },
+  pages: {
+    signIn: '/auth/signin',
+    signOut: '/',
+    error: '/auth/error',
+    verifyRequest: '/auth/verify-request',
+    newUser: '/auth/new-user'
+  },
+
 });
 
 declare module "next-auth" {
@@ -43,4 +60,11 @@ declare module "next-auth" {
     convexToken: string;
     role: Role
   }
+
+  interface User {
+    role: Role;
+  }
 }
+
+
+

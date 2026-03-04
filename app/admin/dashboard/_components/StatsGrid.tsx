@@ -17,7 +17,7 @@ function StatCard({
   value: string;
 }) {
   return (
-    <div className="bg-ui-surface/60 border border-white/5 rounded-xl p-6 backdrop-blur-md hover:border-brand-primary/20 transition flex flex-col justify-between">
+    <div className="bg-ui-surface/60 border border-brand-primary/20 rounded-xl p-6 backdrop-blur-md hover:border-brand-primary transition flex flex-col justify-between">
       <p className="text-sm text-ui-text/60">{label}</p>
       <p className="text-2xl font-semibold mt-2 text-brand-primary">
         {value}

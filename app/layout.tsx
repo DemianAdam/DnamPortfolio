@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { Inter_Tight, Geist_Mono } from "next/font/google";import "./globals.css";
+import { Inter_Tight, Geist_Mono } from "next/font/google"; import "./globals.css";
 import { auth } from "@/auth";
 import ConvexClientProvider from "./ConvexProviderWithAuth";
 
@@ -27,10 +27,12 @@ export default async function RootLayout({
   const session = await auth();
   return (
     <html lang="en">
-      <body className={`${inter.variable} ${geistMono.variable} antialiased`}>
-        <ConvexClientProvider session={session}>
-          {children}
-        </ConvexClientProvider>
+      <body className={`${inter.variable} ${geistMono.variable} antialiased relative`}>
+        <div className="relative z-10">
+          <ConvexClientProvider session={session}>
+            {children}
+          </ConvexClientProvider>
+        </div>
       </body>
     </html>
   );

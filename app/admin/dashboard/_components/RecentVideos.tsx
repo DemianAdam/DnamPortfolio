@@ -34,7 +34,7 @@ function RecentVideoItem({
   status: string;
 }) {
   return (
-    <div className="flex justify-between items-center bg-ui-surface/60 border border-white/5 rounded-lg px-5 py-4 hover:border-brand-primary/20 transition">
+    <div className="flex justify-between items-center bg-ui-surface/60 border border-brand-primary/20 rounded-lg px-5 py-4 hover:border-brand-primary transition">
       <div>
         <p className="font-medium">{title}</p>
         <p className="text-sm text-ui-text/50">{date}</p>

@@ -37,7 +37,7 @@ function ActionButton({
 
         bg-linear-to-b
         from-brand-primary
-        to-[#c48725]
+        to-[#6d48ff]
 
         text-brand-primary-contrast
         font-medium tracking-wide
