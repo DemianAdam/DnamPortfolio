@@ -1,8 +1,19 @@
 "use client";
 import { Button } from "@/app/_components/Button";
-import { signIn } from "next-auth/react";
-
+import { signIn, useSession } from "next-auth/react";
+import { redirect } from "next/navigation";
 export function Navbar() {
+  const { data: session } = useSession();
+  const handleClick = async () => {
+    if (!session) {
+      await signIn(undefined, {
+        redirectTo: "/student"
+      })
+    }
+    else {
+      redirect("/student/dashboard");
+    }
+  }
   return (
     <div className="sticky top-0 z-50 backdrop-blur border-b border-white/5">
       <div className="mx-auto flex h-16 max-w-6xl items-center justify-between px-6">
@@ -14,8 +25,8 @@ export function Navbar() {
           <a href="#proyectos">Proyectos</a>
           <a href="#mentorías">Mentorías</a>
           <a href="#contacto">Contacto</a>
-          <Button onClick={() => signIn()} size="sm">
-            Inicia Sesion
+          <Button onClick={handleClick} size="sm">
+            {!session ? "Inicia Sesion" : "Mi Panel"}
           </Button>
         </div>
       </div>

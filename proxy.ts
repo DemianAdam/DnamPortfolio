@@ -17,8 +17,6 @@ export default auth((req) => {
 
   const rolePath = `/${session.role}`;
 
-  console.log(pathname === rolePath);
-
   if (pathname.startsWith(rolePath)) {
     if (pathname === rolePath) {
       const dashboardPath = `${rolePath}/dashboard`;
@@ -29,7 +27,7 @@ export default auth((req) => {
 
   } else {
     return NextResponse.redirect(
-      new URL("/", req.url)
+      new URL(rolePath, req.url)
     );
   }
 

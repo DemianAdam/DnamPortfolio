@@ -21,11 +21,11 @@ const variants: Record<Variant, string> = {
   primary:
     "bg-brand-primary text-brand-primary-contrast hover:bg-brand-primary/90",
   secondary:
-    "border border-white/10 bg-ui-surface hover:bg-white/5",
+    "border border-black/30 bg-ui-surface hover:bg-black/5",
   ghost:
-    "hover:bg-white/5",
+    "hover:bg-black/5",
   destructive:
-    "bg-state-destructive text-white hover:opacity-90",
+    "bg-state-destructive text-black hover:opacity-90",
 };
 
 const sizes: Record<Size, string> = {

@@ -38,16 +38,10 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
       return { ...session, convexToken };
     },
 
-    async redirect({ url, baseUrl }) {
-      console.log("Redirecting to:", url);
-      console.log("Base URL:", baseUrl);
-      return url;
-    }
-
   },
   pages: {
     signIn: '/auth/signin',
-    signOut: '/',
+    signOut: '/auth/signout',
     error: '/auth/error',
     verifyRequest: '/auth/verify-request',
     newUser: '/auth/new-user'

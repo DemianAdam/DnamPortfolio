@@ -24,13 +24,13 @@ export function AboutSection() {
 
             <p className="text-ui-text/70">
               Trabajo profesionalmente construyendo sistemas backend y aplicaciones completas.
-              Mi enfoque como mentor no se basa en repetir ejercicios, sino en enseñar a pensar,
+              Mi enfoque como profesor no se basa en repetir ejercicios, sino en enseñar a pensar,
               estructurar y comprender cómo funcionan los sistemas en el mundo real.
             </p>
 
             <p className="text-ui-text/70">
               Trabajo principalmente con .NET en backend, y tengo experiencia fullstack en
-              JavaScript, React, Next.js y SQL, además de fundamentos sólidos en C, C++ y Lua.
+              JavaScript, React, Next.js y SQL, además de fundamentos sólidos en C y C++.
             </p>
 
             <p className="text-ui-text/70">

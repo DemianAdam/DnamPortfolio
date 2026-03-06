@@ -13,7 +13,7 @@ export default function AdminHeader({
         {/* Hamburger */}
         <button
           className="lg:hidden text-ui-text/70 hover:text-brand-primary transition"
-          onClick={() => {setOpen(true); console.log("test")}}
+          onClick={() => { setOpen(true); console.log("test") }}
         >
           ☰
         </button>
@@ -25,7 +25,9 @@ export default function AdminHeader({
       </div>
 
       <button
-        onClick={() => signOut()}
+        onClick={() => signOut({
+          redirectTo: "/"
+        })}
         className="text-sm text-ui-text/60 hover:text-brand-primary transition"
       >
         Sign out
