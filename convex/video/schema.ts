@@ -1,5 +1,5 @@
 import { zodOutputToConvex } from "convex-helpers/server/zod";
-import { videoValidator } from "./validator";
+import { videoValidator } from "./validators";
 import { defineTable } from "convex/server";
 
 const videoSchema = zodOutputToConvex(videoValidator);

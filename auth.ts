@@ -4,8 +4,9 @@ import { SignJWT, importPKCS8 } from "jose";
 import NextAuth from "next-auth";
 import Google from "next-auth/providers/google";
 import { api } from "./convex/_generated/api";
-import { Role } from "./convex/user/roles";
+
 import Resend from "next-auth/providers/resend";
+import { Role } from "./convex/user/types/role";
 const CONVEX_SITE_URL = process.env.NEXT_PUBLIC_CONVEX_URL!.replace(
   /.cloud$/,
   ".site",
