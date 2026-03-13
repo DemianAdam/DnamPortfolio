@@ -1,10 +1,10 @@
 import { NextResponse } from "next/server";
 import { PutObjectCommand } from "@aws-sdk/client-s3";
 import { getSignedUrl } from "@aws-sdk/s3-request-presigner";
-import { r2 } from "@/lib/r2";
 import crypto from "crypto";
 import { auth } from "@/auth";
-import { ROLES } from "@/convex/user/roles";
+import { ROLES } from "@/convex/user/types/role";
+import { r2Client } from "@/lib/r2/r2Client";
 
 
 export const runtime = "nodejs";
@@ -23,7 +23,8 @@ export async function POST(req: Request) {
   const { filename, contentType } = await req.json();
 
   const uniqueId = crypto.randomUUID();
-  const r2Key = `videos/${uniqueId}-${filename}`;
+  const extension = filename.split(".").pop();
+  const r2Key = `videos/${uniqueId}.${extension}`;
 
   const command = new PutObjectCommand({
     Bucket: process.env.R2_BUCKET_NAME!,
@@ -31,7 +32,7 @@ export async function POST(req: Request) {
     ContentType: contentType,
   });
 
-  const uploadUrl = await getSignedUrl(r2, command, {
+  const uploadUrl = await getSignedUrl(r2Client, command, {
     expiresIn: 60 * 5, // 5 minutes
   });
 
@@ -41,7 +42,7 @@ export async function POST(req: Request) {
   });
 }
 
-async function testUpload() {
+/*async function testUpload() {
   const file = new File(["hello world"], "test.txt", { type: "text/plain" });
   const res = await fetch("/api/r2/upload", {
     method: "POST",
@@ -52,4 +53,4 @@ async function testUpload() {
   await fetch(uploadUrl, { method: "PUT", headers: { "Content-Type": file.type }, body: file });
   console.log("Uploaded with key:", r2Key);
 }
-testUpload();
+testUpload();*/

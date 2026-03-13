@@ -1,5 +1,6 @@
-import { VideoTable } from "./components/VideoTable";
+
 import Link from "next/link";
+import { VideoTable } from "./_components/VideoTable";
 
 export default function AdminVideosPage() {
     return (

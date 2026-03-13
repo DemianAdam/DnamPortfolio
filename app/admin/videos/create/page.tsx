@@ -1,162 +1,141 @@
 "use client";
 
-import { useState } from "react";
-import { useMutation } from "convex/react";
+import { useQuery } from "convex/react";
+import { useCreateVideo } from "./_hooks/useCreateVideo";
+import { useVideoForm } from "./_hooks/useVideoForm";
 import { api } from "@/convex/_generated/api";
-import { CreateVideoDTO } from "@/convex/video/dtos";
 
 
 export default function CreateVideoPage() {
-  const createVideo = useMutation(api.video.mutations.createVideo);
-
-  const [form, setForm] = useState<CreateVideoDTO>({
-    title: "",
-    description: "",
-    r2Key: "",
-    duration: 0,
-    isFree: false,
-    freeUntil: undefined,
-    date: Date.now(),
-  });
-
-  const handleChange = (
-    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
-  ) => {
-    const { name, value, type } = e.target;
-
-    setForm((prev) => ({
-      ...prev,
-      [name]:
-        type === "number"
-          ? Number(value)
-          : value,
-    }));
-  };
-
-  const handleCheckbox = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const { checked } = e.target;
-
-    setForm((prev) => ({
-      ...prev,
-      isFree: checked,
-      freeUntil: checked ? prev.freeUntil : undefined,
-    }));
-  };
-
-  const handleFreeUntil = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const value = e.target.value;
-
-    setForm((prev) => ({
-      ...prev,
-      freeUntil: value ? new Date(value).getTime() : undefined,
-    }));
-  };
-
-  const handleSubmit = async (e: React.FormEvent) => {
+  const form = useVideoForm();
+  const { submitVideo, uploading } = useCreateVideo();
+  const users = useQuery(api.user.queries.listUsersForAssignment);
+  const handleSubmit = async (e: React.SubmitEvent<HTMLFormElement>) => {
     e.preventDefault();
 
-    await createVideo(form);
+    if (!form.videoFile) {
+      alert("Please select a video file");
+      return;
+    }
 
-    alert("Video created!");
+    try {
+      await submitVideo({
+        title: form.title,
+        description: form.description,
+        duration: form.duration,
+        file: form.videoFile,
+        isFree: form.isFree,
+        freeUntil: form.freeUntil,
+        assignedUsers: form.assignedUsers
+      });
 
-    setForm({
-      title: "",
-      description: "",
-      r2Key: "",
-      duration: 0,
-      isFree: false,
-      freeUntil: undefined,
-      date: Date.now(),
-    });
+      alert("Video created successfully");
+    } catch (err) {
+      console.error(err);
+      alert("Failed to create video");
+    }
   };
 
   return (
-    <div className="max-w-xl mx-auto p-6 space-y-6">
-      <h1 className="text-2xl font-bold">Create Video</h1>
+    <div className="max-w-2xl mx-auto py-10">
+      <h1 className="text-2xl font-semibold mb-6">Create Video</h1>
 
-      <form onSubmit={handleSubmit} className="space-y-4">
-        
+      <form onSubmit={handleSubmit} className="space-y-6">
         {/* Title */}
-        <div>
-          <label className="block text-sm font-medium">Title</label>
+        <div className="flex flex-col gap-1">
+          <label className="font-medium">Title</label>
           <input
-            name="title"
+            type="text"
             value={form.title}
-            onChange={handleChange}
-            className="w-full border rounded p-2"
+            onChange={(e) => form.setTitle(e.target.value)}
+            className="border rounded px-3 py-2"
             required
           />
         </div>
 
         {/* Description */}
-        <div>
-          <label className="block text-sm font-medium">Description</label>
+        <div className="flex flex-col gap-1">
+          <label className="font-medium">Description</label>
           <textarea
-            name="description"
             value={form.description}
-            onChange={handleChange}
-            className="w-full border rounded p-2"
+            onChange={(e) => form.setDescription(e.target.value)}
+            className="border rounded px-3 py-2"
             rows={4}
-          />
-        </div>
-
-        {/* R2 Key */}
-        <div>
-          <label className="block text-sm font-medium">R2 Key</label>
-          <input
-            name="r2Key"
-            value={form.r2Key}
-            onChange={handleChange}
-            className="w-full border rounded p-2"
             required
           />
         </div>
 
-        {/* Duration */}
-        <div>
-          <label className="block text-sm font-medium">
-            Duration (seconds)
-          </label>
+        {/* Video file */}
+        <div className="flex flex-col gap-1">
+          <label className="font-medium">Video file</label>
           <input
-            type="number"
-            name="duration"
-            value={form.duration}
-            onChange={handleChange}
-            className="w-full border rounded p-2"
-            required
+            type="file"
+            accept="video/*"
+            onChange={form.handleFileChange}
           />
+
+          {form.duration > 0 && (
+            <span className="text-sm text-gray-500">
+              Duration: {Math.round(form.duration)} seconds
+            </span>
+          )}
         </div>
 
-        {/* Free */}
+        {/* Free video */}
         <div className="flex items-center gap-2">
           <input
             type="checkbox"
             checked={form.isFree}
-            onChange={handleCheckbox}
+            onChange={(e) => form.setIsFree(e.target.checked)}
           />
-          <label>Free Video</label>
+          <label>Free video</label>
         </div>
 
-        {/* Free Until */}
+        {/* Free until */}
         {form.isFree && (
-          <div>
-            <label className="block text-sm font-medium">
-              Free Until
-            </label>
+          <div className="flex flex-col gap-1">
+            <label className="font-medium">Free until</label>
             <input
               type="date"
-              onChange={handleFreeUntil}
-              className="w-full border rounded p-2"
+              value={form.freeUntil ?? ""}
+              onChange={(e) => form.setFreeUntil(e.target.value)}
+              className="border rounded px-3 py-2"
             />
           </div>
         )}
 
+        <div className="flex flex-col gap-2">
+          <label className="font-medium">Assign to users</label>
+
+          <div className="border rounded p-3 max-h-40 overflow-y-auto">
+            {users?.map((user) => (
+              <label key={user.id} className="flex items-center gap-2">
+                <input
+                  type="checkbox"
+                  checked={!!form.assignedUsers.find(x => x.id === user.id)}
+                  onChange={(e) => {
+                    if (e.target.checked) {
+                      form.setAssignedUsers([...form.assignedUsers, user]);
+                    } else {
+                      form.setAssignedUsers(
+                        form.assignedUsers.filter((x) => x.id !== user.id)
+                      );
+                    }
+                  }}
+                />
+                {user.name} ({user.email})
+              </label>
+            ))}
+          </div>
+        </div>
+
         {/* Submit */}
         <button
           type="submit"
-          className="px-4 py-2 bg-blue-600 text-white rounded"
+          disabled={uploading}
+          className="bg-black text-white px-4 py-2 rounded disabled:opacity-50"
         >
-          Create Video
+          {uploading ? "Uploading..." : "Create Video"}
         </button>
       </form>
     </div>

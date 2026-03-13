@@ -28,6 +28,9 @@ import type * as auth_verificationToken_validators from "../auth/verificationTok
 import type * as counter from "../counter.js";
 import type * as http from "../http.js";
 import type * as triggers from "../triggers.js";
+import type * as user_dtos from "../user/dtos.js";
+import type * as user_mappers from "../user/mappers.js";
+import type * as user_queries from "../user/queries.js";
 import type * as user_types_role from "../user/types/role.js";
 import type * as user_validators from "../user/validators.js";
 import type * as videoAccess_validator from "../videoAccess/validator.js";
@@ -36,6 +39,7 @@ import type * as video_mapper from "../video/mapper.js";
 import type * as video_mutations from "../video/mutations.js";
 import type * as video_queries from "../video/queries.js";
 import type * as video_triggers from "../video/triggers.js";
+import type * as video_utils from "../video/utils.js";
 import type * as video_validators from "../video/validators.js";
 import type * as zod_zod from "../zod/zod.js";
 
@@ -66,6 +70,9 @@ declare const fullApi: ApiFromModules<{
   counter: typeof counter;
   http: typeof http;
   triggers: typeof triggers;
+  "user/dtos": typeof user_dtos;
+  "user/mappers": typeof user_mappers;
+  "user/queries": typeof user_queries;
   "user/types/role": typeof user_types_role;
   "user/validators": typeof user_validators;
   "videoAccess/validator": typeof videoAccess_validator;
@@ -74,6 +81,7 @@ declare const fullApi: ApiFromModules<{
   "video/mutations": typeof video_mutations;
   "video/queries": typeof video_queries;
   "video/triggers": typeof video_triggers;
+  "video/utils": typeof video_utils;
   "video/validators": typeof video_validators;
   "zod/zod": typeof zod_zod;
 }>;
