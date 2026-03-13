@@ -1,7 +1,7 @@
 import { Doc } from "../../_generated/dataModel";
 import { getAuthUserId } from "@convex-dev/auth/server";
 import { MutationCtx, QueryCtx } from "../../_generated/server";
-import { Role } from "../../user/types/Role";
+import { Role } from "../../user/types/role";
 import { AppError } from "../../../lib/errors/AppError";
 import { ERROR_CODE } from "../../../lib/errors/registry";
 

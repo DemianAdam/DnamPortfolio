@@ -32,6 +32,7 @@ import type * as user_dtos from "../user/dtos.js";
 import type * as user_mappers from "../user/mappers.js";
 import type * as user_queries from "../user/queries.js";
 import type * as user_types_role from "../user/types/role.js";
+import type * as user_types_user from "../user/types/user.js";
 import type * as user_validators from "../user/validators.js";
 import type * as videoAccess_validator from "../videoAccess/validator.js";
 import type * as video_dtos from "../video/dtos.js";
@@ -74,6 +75,7 @@ declare const fullApi: ApiFromModules<{
   "user/mappers": typeof user_mappers;
   "user/queries": typeof user_queries;
   "user/types/role": typeof user_types_role;
+  "user/types/user": typeof user_types_user;
   "user/validators": typeof user_validators;
   "videoAccess/validator": typeof videoAccess_validator;
   "video/dtos": typeof video_dtos;

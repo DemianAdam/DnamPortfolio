@@ -1,5 +1,5 @@
 import { SimpleUserDTO } from "./dtos";
-import { CompletedUser } from "./types/User";
+import { CompletedUser } from "./types/user";
 
 export function toSimpleUserDTO(user: CompletedUser): SimpleUserDTO {
     return {
