@@ -4,7 +4,9 @@ import { zUserQuery } from "../zod/zod";
 import { toVideoDetailsDTO, toVideoListItemDTO } from "./mapper";
 import { canUserAccessVideo } from "./utils";
 import { videoDetailsValidator, videoListItemValidator } from "./validators";
-import { ConvexError } from "convex/values";
+
+import { AppError } from "../../lib/errors/AppError"
+import { ERROR_CODE } from "../../lib/errors/registry";
 
 export const listVideos = zUserQuery({
     role: ROLES.ADMIN,
@@ -29,7 +31,7 @@ export const getVideoById = zUserQuery({
         const video = await ctx.db.get("videos", args.id);
 
         if (!video) {
-            throw new ConvexError("Video not found");
+            throw new AppError(ERROR_CODE.VIDEO.NOT_FOUND, { videoId: args.id });
         }
 
         if (ctx.currentUser.role === ROLES.ADMIN) {
@@ -39,7 +41,7 @@ export const getVideoById = zUserQuery({
         const canAccess = await canUserAccessVideo(ctx, ctx.currentUser._id, video);
 
         if (!canAccess) {
-            throw new ConvexError("Unauthorized");
+            throw new AppError(ERROR_CODE.AUTH.UNAUTHORIZED);
         }
 
         return toVideoDetailsDTO(video);//TODO: TEST
@@ -56,17 +58,17 @@ export const getR2Key = zUserQuery({
         const video = await ctx.db.get("videos", args.videoId);
 
         if (!video) {
-            throw new ConvexError("Video not found");
+            throw new AppError(ERROR_CODE.VIDEO.NOT_FOUND, { videoId: args.videoId });
         }
 
-        if(ctx.currentUser.role === ROLES.ADMIN){
+        if (ctx.currentUser.role === ROLES.ADMIN) {
             return video.r2Key
         }
 
-         const canAccess = await canUserAccessVideo(ctx, ctx.currentUser._id, video);
+        const canAccess = await canUserAccessVideo(ctx, ctx.currentUser._id, video);
 
         if (!canAccess) {
-            throw new ConvexError("Unauthorized");
+            throw new AppError(ERROR_CODE.AUTH.UNAUTHORIZED);
         }
 
         return video.r2Key;

@@ -1,12 +1,7 @@
-import { ConvexError } from "convex/values";
-import { Doc } from "../_generated/dataModel";
 import { SimpleUserDTO } from "./dtos";
+import { CompletedUser } from "./types/User";
 
-export function toSimpleUserDTO(user: Doc<"users">): SimpleUserDTO {
-    if (!user.completed) {
-        throw new ConvexError("SimpleUser must have name.");
-    }
-
+export function toSimpleUserDTO(user: CompletedUser): SimpleUserDTO {
     return {
         id: user._id,
         email: user.email,
