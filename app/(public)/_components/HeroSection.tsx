@@ -1,7 +1,6 @@
 import { Button } from "@/app/_components/Button";
 import { Container } from "@/app/_components/Container";
 import { Section } from "@/app/_components/Section";
-import Image from "next/image";
 
 export function HeroSection() {
     return (

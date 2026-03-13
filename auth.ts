@@ -1,9 +1,9 @@
 import { ConvexAdapter } from "@/app/ConvexAdapter";
-import { fetchQuery } from "convex/nextjs";
+
 import { SignJWT, importPKCS8 } from "jose";
 import NextAuth from "next-auth";
 import Google from "next-auth/providers/google";
-import { api } from "./convex/_generated/api";
+
 
 import Resend from "next-auth/providers/resend";
 import { Role } from "./convex/user/types/role";

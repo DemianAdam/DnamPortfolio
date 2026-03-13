@@ -2,16 +2,10 @@ import { VideoListItemDTO } from "@/convex/video/dtos";
 import Link from "next/link";
 
 export function VideoRow({ video }: { video: VideoListItemDTO }) {
-
   const durationMinutes = Math.round(video.duration / 60);
-
-  const now = Date.now();
 
   const freeUntilDate =
     video.freeUntil ? new Date(video.freeUntil) : null;
-
-  const isExpired =
-    video.freeUntil !== undefined && video.freeUntil < now;
 
   return (
     <tr className="border-t">
@@ -41,7 +35,7 @@ export function VideoRow({ video }: { video: VideoListItemDTO }) {
       <td className="p-3">
         {video.isFree ? (
           freeUntilDate ? (
-            <span className={isExpired ? "text-red-600" : ""}>
+            <span className={video.isExpired ? "text-red-600" : ""}>
               {freeUntilDate.toLocaleDateString()}
             </span>
           ) : (

@@ -37,6 +37,7 @@ export const zUserMutation = zCustomMutation(mutation, {
 export const zUserAction = zCustomAction(action, {
     args: {},
     input: async (ctx, args, opts: { role: Role }) => {
+        /* eslint-disable @typescript-eslint/no-explicit-any */
         const currentUser = await getCurrentUser(ctx as any);
         requireRole(currentUser, opts.role)
         return {

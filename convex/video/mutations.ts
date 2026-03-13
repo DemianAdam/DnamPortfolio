@@ -1,4 +1,3 @@
-import { getCurrentUser } from "../auth/user/functions";
 import { ROLES } from "../user/types/role";
 import {  zUserMutation } from "../zod/zod";
 import { createVideoValidator } from "./validators";

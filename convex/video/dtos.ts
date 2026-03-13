@@ -1,5 +1,5 @@
 import { z } from "zod";
-import { createVideoValidator, updateVideoValidator, videoDetailsValidator, videoListItemValidator, videoValidator } from "./validators";
+import { createVideoValidator, updateVideoValidator, videoDetailsValidator, videoListItemValidator } from "./validators";
 
 export type CreateVideoDTO = z.infer<typeof createVideoValidator>;
 

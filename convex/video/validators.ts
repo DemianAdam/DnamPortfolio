@@ -35,7 +35,8 @@ export const videoListItemValidator = videoValidator.pick({
     isFree: true,
     freeUntil: true
 }).extend({
-    id: zid("videos")
+    id: zid("videos"),
+    isExpired: z.boolean()
 });
 
 export const videoDetailsValidator = videoValidator.pick({

@@ -2,6 +2,7 @@ import { Doc } from "../_generated/dataModel";
 import { VideoDetailsDTO, VideoListItemDTO } from "./dtos";
 
 export function toVideoListItemDTO(video: Doc<"videos">): VideoListItemDTO {
+    const now = Date.now();
     return {
         id: video._id,
         title: video.title,
@@ -9,6 +10,7 @@ export function toVideoListItemDTO(video: Doc<"videos">): VideoListItemDTO {
         date: video.date,
         isFree: video.isFree,
         freeUntil: video.freeUntil,
+        isExpired: video.freeUntil !== undefined && video.freeUntil < now
     };
 }
 

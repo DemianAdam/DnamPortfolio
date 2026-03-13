@@ -2,7 +2,6 @@
 import { useQuery } from "convex/react";
 import { api } from "@/convex/_generated/api";
 import { VideoRow } from "./VideoRow";
-import { VideoListItemDTO } from "@/convex/video/dtos";
 
 
 export function VideoTable() {
