@@ -1,4 +1,5 @@
-import { isAppError } from "@/lib/errors";
+import { AppError } from "./errors/AppError";
+
 
 type ApiHandler = (req: Request) => Promise<Response>;
 
@@ -8,19 +9,24 @@ export function apiHandler(handler: ApiHandler): ApiHandler {
       return await handler(req);
     } catch (err) {
 
-      if (isAppError(err)) {
+      if (err instanceof AppError) {
         return Response.json(
-          { error: err.code },
+          {
+            code: err.code,
+            meta: err.meta
+          },
           { status: err.status }
-        );
+        )
       }
 
-      console.error("Unhandled error:", err);
+      console.error("Unhandled error:", err)
 
       return Response.json(
-        { error: "INTERNAL_ERROR" },
+        {
+          code: "INTERNAL_SERVER_ERROR"
+        },
         { status: 500 }
-      );
+      )
     }
   };
 }
