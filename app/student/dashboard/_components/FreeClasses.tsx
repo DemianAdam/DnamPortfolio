@@ -42,11 +42,11 @@ flex items-center justify-between
 
       <div>
         <p className="font-medium">
-          Dynamic Programming Basics
+          {title}
         </p>
 
         <p className="text-sm text-ui-text/60">
-          Available until 2026-03-10
+          Available until {expires}
         </p>
       </div>
 
