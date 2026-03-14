@@ -9,9 +9,9 @@ export default function QuickActions() {
       </h2>
 
       <div className="grid md:grid-cols-3 gap-4 rounded-xl
-border border-brand-primary/20
-bg-brand-primary/5
-p-5
+      border border-brand-primary/20
+      bg-brand-primary/5
+      p-5
 ">
         <ActionCard
           href="/student/videos"

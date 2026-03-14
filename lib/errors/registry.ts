@@ -1,6 +1,7 @@
 import { ACCESS_CODE_ERROR_CODE, ACCESS_CODE_ERRORS } from "./accessCode";
 import { AUTH_ERROR_CODE, AUTH_ERRORS } from "./auth";
 import { USER_ERROR_CODE, USER_ERRORS } from "./user";
+import { VALIDATION_ERROR_CODE, VALIDATION_ERRORS } from "./validation";
 import { VIDEO_ERROR_CODE, VIDEO_ERRORS } from "./video";
 
 
@@ -8,14 +9,16 @@ export const ERROR_CODE = {
   AUTH: AUTH_ERROR_CODE,
   VIDEO: VIDEO_ERROR_CODE,
   ACCESS_CODE: ACCESS_CODE_ERROR_CODE,
-  USER: USER_ERROR_CODE
+  USER: USER_ERROR_CODE,
+  VALIDATION: VALIDATION_ERROR_CODE
 } as const
 
 export const ERROR_REGISTRY = {
   ...AUTH_ERRORS,
   ...VIDEO_ERRORS,
   ...ACCESS_CODE_ERRORS,
-  ...USER_ERRORS
+  ...USER_ERRORS,
+  ...VALIDATION_ERRORS
 } as const
 
 export type ErrorCode = keyof typeof ERROR_REGISTRY

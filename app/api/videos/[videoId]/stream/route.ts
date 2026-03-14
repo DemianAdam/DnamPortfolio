@@ -5,9 +5,34 @@ import { fetchQuery } from "convex/nextjs";
 import { GetObjectCommand } from "@aws-sdk/client-s3";
 import { getSignedUrl } from "@aws-sdk/s3-request-presigner";
 import { r2Client } from "@/lib/r2/r2Client";
+//import { apiHandler } from "@/lib/apiHandler";
+import { apiHandler } from "@/lib/api/apiHandler"
+import { AppError } from "@/lib/errors/AppError";
+
+export const GET = apiHandler<"/api/videos/[videoId]/stream">({
+  auth: true
+}, async (ctx) => {
+
+  const r2Key = await fetchQuery(api.video.queries.getR2Key, {
+    videoId: ctx.params.videoId,
+  }, {
+    token: ctx.session.convexToken
+  });
 
 
-export async function GET(
+  const command = new GetObjectCommand({
+    Bucket: process.env.R2_BUCKET_NAME!,
+    Key: r2Key,
+  });
+
+  const signedUrl = await getSignedUrl(r2Client, command, {
+    expiresIn: 180, // 3 minutes
+  });
+
+  return { signedUrl }
+});
+
+/*export async function GET(
   _req: Request,
   { params }: { params: { videoId: string } }
 ) {
@@ -30,9 +55,6 @@ export async function GET(
     }
 
 
-
-    //console.log("Result\n",result);
-
     // 3️⃣ Generate signed URL
     const command = new GetObjectCommand({
       Bucket: process.env.R2_BUCKET_NAME!,
@@ -52,4 +74,4 @@ export async function GET(
     console.error("STREAM ERROR", error);
     return new NextResponse("Internal Server Error", { status: 500 });
   }
-}
+}*/
