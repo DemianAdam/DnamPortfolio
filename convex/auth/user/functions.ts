@@ -18,17 +18,17 @@ export async function getCurrentUser(ctx: QueryCtx | MutationCtx): Promise<Doc<"
     return user;
 }
 
-export function isRole(
-    user: Doc<"users">,
-    role: Role
-): boolean {
-    return user.role === role;
-};
+
 
 export function requireRole(
     user: Doc<"users">,
-    role: Role) {
-    if (!isRole(user, role)) {
+    role: Role | Role[]) {
+    if (Array.isArray(role)) {
+        if(!role.includes(user.role)){
+            throw new AppError(ERROR_CODE.AUTH.UNAUTHORIZED);
+        }
+    }
+    else if (user.role !== role) {
         throw new AppError(ERROR_CODE.AUTH.UNAUTHORIZED);
     }
 }

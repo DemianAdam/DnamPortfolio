@@ -4,15 +4,15 @@ export default function QuickActions() {
       <h2 className="text-lg font-medium">Quick Actions</h2>
 
       <div className="flex gap-4">
-        <ActionButton href="/videos/create">
+        <ActionButton href="/admin/videos/create">
           Upload New Video
         </ActionButton>
 
-        <ActionButton href="/access-codes">
+        <ActionButton href="/admin/access-codes">
           Create Access Code
         </ActionButton>
 
-        <ActionButton href="/users">
+        <ActionButton href="/admin/users">
           Manage Students
         </ActionButton>
       </div>

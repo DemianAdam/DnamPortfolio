@@ -26,52 +26,8 @@ export const GET = apiHandler<"/api/videos/[videoId]/stream">({
   });
 
   const signedUrl = await getSignedUrl(r2Client, command, {
-    expiresIn: 180, // 3 minutes
+    expiresIn: 20
   });
 
-  return { signedUrl }
+  return NextResponse.redirect(signedUrl)
 });
-
-/*export async function GET(
-  _req: Request,
-  { params }: { params: { videoId: string } }
-) {
-  try {
-    const session = await auth();
-    if (!session) {
-      return new NextResponse("Unauthorized", { status: 401 });
-    }
-
-    const { videoId } = await params;
-
-    const r2Key = await fetchQuery(api.video.queries.getR2Key, {
-      videoId: videoId,
-    }, {
-      token: session.convexToken
-    });
-
-    if (!r2Key) {
-      return new NextResponse("Forbidden", { status: 403 });
-    }
-
-
-    // 3️⃣ Generate signed URL
-    const command = new GetObjectCommand({
-      Bucket: process.env.R2_BUCKET_NAME!,
-      Key: r2Key,
-    });
-
-    const signedUrl = await getSignedUrl(r2Client, command, {
-      expiresIn: 180, // 3 minutes
-    });
-
-    // 4️⃣ Return signed URL
-    return NextResponse.json({
-      url: signedUrl,
-    });
-
-  } catch (error) {
-    console.error("STREAM ERROR", error);
-    return new NextResponse("Internal Server Error", { status: 500 });
-  }
-}*/

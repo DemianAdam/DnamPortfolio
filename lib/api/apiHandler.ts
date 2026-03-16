@@ -4,9 +4,11 @@ import { AppError } from "@/lib/errors/AppError"
 import { ERROR_CODE } from "@/lib/errors/registry"
 import { parseBody } from "./parseBody"
 import { logApi } from "./logger"
-import { ApiOptions } from "./types"
+import { ApiContext, ApiOptions, ApiSession } from "./types"
 import { NextRequest, NextResponse } from "next/server"
 import { AppRouteHandlerRoutes } from "@/.next/dev/types/routes"
+import { Session } from "next-auth"
+
 
 export function apiHandler<
   TRoute extends AppRouteHandlerRoutes,
@@ -14,12 +16,7 @@ export function apiHandler<
   TResponse = unknown
 >(
   options: ApiOptions<TBodySchema>,
-  handler: (ctx: {
-    request: NextRequest
-    body: TBodySchema extends z.ZodTypeAny ? z.infer<TBodySchema> : undefined
-    session: any | null
-    params: Awaited<RouteContext<TRoute>["params"]>
-  }) => Promise<TResponse>
+  handler: (ctx: ApiContext<TRoute, TBodySchema>) => Promise<TResponse>
 ) {
   return async (
     request: NextRequest,
@@ -35,10 +32,27 @@ export function apiHandler<
       })
 
       // AUTH
-      let session = null
+      let session: ApiSession | null = null
 
       if (options.auth) {
-        session = await auth()
+
+        const authHeader = request.headers.get("authorization")
+
+        // Desktop app authentication
+        if (authHeader?.startsWith("Bearer ")) {
+
+          const token = authHeader.replace("Bearer ", "")
+
+          session = {
+            convexToken: token,
+            source: "desktop"
+          }
+
+        }
+        // Browser authentication
+        else {
+          session = await auth()
+        }
 
         if (!session) {
           throw new AppError(ERROR_CODE.AUTH.UNAUTHENTICATED)
@@ -67,6 +81,10 @@ export function apiHandler<
         path: request.url,
         duration
       })
+
+      if (result instanceof NextResponse) {
+        return result
+      }
 
       return NextResponse.json(result)
 

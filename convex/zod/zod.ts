@@ -12,7 +12,7 @@ export const zAction = zCustomAction(action, NoOp);
 
 export const zUserQuery = zCustomQuery(query, {
     args: {},
-    input: async (ctx, args, opts: { role: Role }) => {
+    input: async (ctx, args, opts: { role: Role | Role[] }) => {
         const currentUser = await getCurrentUser(ctx);
         requireRole(currentUser, opts.role)
         return {

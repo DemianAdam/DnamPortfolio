@@ -23,7 +23,7 @@ export const listVideos = zUserQuery({
 });
 
 export const getVideoById = zUserQuery({
-    role: ROLES.STUDENT || ROLES.ADMIN,
+    role: [ROLES.STUDENT, ROLES.ADMIN],
     args: {
         id: zid("videos")
     },
@@ -50,7 +50,7 @@ export const getVideoById = zUserQuery({
 });
 
 export const getR2Key = zUserQuery({
-    role: ROLES.STUDENT || ROLES.ADMIN,
+    role: [ROLES.STUDENT, ROLES.ADMIN],
     args: {
         videoId: zid("videos")
     },
