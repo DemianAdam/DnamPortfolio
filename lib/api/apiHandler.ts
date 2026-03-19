@@ -1,22 +1,20 @@
-import { z } from "zod"
 import { auth } from "@/auth"
 import { AppError } from "@/lib/errors/AppError"
 import { ERROR_CODE } from "@/lib/errors/registry"
 import { parseBody } from "./parseBody"
 import { logApi } from "./logger"
-import { ApiContext, ApiOptions, ApiSession } from "./types"
+import { ApiContext, ApiOptions, ApiSession, SessionFromOptions } from "./types"
 import { NextRequest, NextResponse } from "next/server"
 import { AppRouteHandlerRoutes } from "@/.next/dev/types/routes"
-import { Session } from "next-auth"
-
+import z from "zod"
 
 export function apiHandler<
   TRoute extends AppRouteHandlerRoutes,
-  TBodySchema extends z.ZodTypeAny | undefined = undefined,
+  TOptions extends ApiOptions<z.ZodTypeAny | undefined> = ApiOptions<z.ZodTypeAny | undefined>,
   TResponse = unknown
 >(
-  options: ApiOptions<TBodySchema>,
-  handler: (ctx: ApiContext<TRoute, TBodySchema>) => Promise<TResponse>
+  options: TOptions,
+  handler: (ctx: ApiContext<TRoute, TOptions>) => Promise<TResponse>
 ) {
   return async (
     request: NextRequest,
@@ -60,18 +58,22 @@ export function apiHandler<
       }
 
       // BODY
-      let body: any = undefined
+
+
+      let body: unknown
 
       if (options.body) {
         body = await parseBody(request, options.body)
+      } else {
+        body = undefined
       }
 
       const params = await context.params
 
       const result = await handler({
         request,
-        body,
-        session,
+        body: body as ApiContext<TRoute, TOptions>["body"],
+        session: session as SessionFromOptions<TOptions>,
         params
       })
 

@@ -7,7 +7,7 @@ export function toVideoListItemDTO(video: Doc<"videos">): VideoListItemDTO {
         id: video._id,
         title: video.title,
         duration: video.duration,
-        date: video.date,
+        publishDate: video.publishDate,
         isFree: video.isFree,
         freeUntil: video.freeUntil,
         isExpired: video.freeUntil !== undefined && video.freeUntil < now
@@ -20,7 +20,7 @@ export function toVideoDetailsDTO(video: Doc<"videos">): VideoDetailsDTO {
         title: video.title,
         description: video.description,
         duration: video.duration,
-        date: video.date,
+        publishDate: video.publishDate,
         isFree: video.isFree
     }
 }

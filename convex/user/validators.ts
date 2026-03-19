@@ -33,4 +33,10 @@ export const simpleUserValidator = z.object({
   email: z.string()
 });
 
+export const adminUserValidator = z.object({
+  _id: z.string(),
+  role: z.literal(ROLES.ADMIN)
+});
+
+export const userIdValidator = z.union([zid("users"), adminUserValidator.pick({ _id: true }).shape._id])
 

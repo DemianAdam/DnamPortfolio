@@ -1,4 +1,4 @@
-// app/api/admin/token/route.ts
+// app/api/admin/auth/route.ts
 import { SignJWT, importPKCS8 } from "jose";
 import { apiHandler } from "@/lib/api/apiHandler";
 import { AppError } from "@/lib/errors/AppError";
@@ -10,8 +10,9 @@ export const POST = apiHandler(
   { auth: false },
   async ({ request }) => {
     const adminKey = request.headers.get("X-Admin-Key");
+    const adminId = request.headers.get("X-Admin-Id");
 
-    if (adminKey !== process.env.ADMIN_API_KEY) {
+    if (adminKey !== process.env.ADMIN_API_KEY || !adminId) {
       throw new AppError(ERROR_CODE.AUTH.UNAUTHENTICATED); // or a forbidden error
     }
 
@@ -20,7 +21,7 @@ export const POST = apiHandler(
       "RS256"
     );
 
-    const token = await new SignJWT({ sub: "admin-service" })
+    const token = await new SignJWT({ sub: "admin-service", adminId })
       .setProtectedHeader({ alg: "RS256" })
       .setIssuedAt()
       .setIssuer(CONVEX_SITE_URL)

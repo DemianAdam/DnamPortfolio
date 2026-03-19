@@ -41,16 +41,3 @@ export async function POST(req: Request) {
     r2Key,
   });
 }
-
-/*async function testUpload() {
-  const file = new File(["hello world"], "test.txt", { type: "text/plain" });
-  const res = await fetch("/api/r2/upload", {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ filename: file.name, contentType: file.type })
-  });
-  const { uploadUrl, r2Key } = await res.json();
-  await fetch(uploadUrl, { method: "PUT", headers: { "Content-Type": file.type }, body: file });
-  console.log("Uploaded with key:", r2Key);
-}
-testUpload();*/

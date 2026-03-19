@@ -1,4 +1,3 @@
-import { auth } from "@/auth";
 import { NextResponse } from "next/server";
 import { api } from "@/convex/_generated/api";
 import { fetchQuery } from "convex/nextjs";
@@ -7,16 +6,12 @@ import { getSignedUrl } from "@aws-sdk/s3-request-presigner";
 import { r2Client } from "@/lib/r2/r2Client";
 //import { apiHandler } from "@/lib/apiHandler";
 import { apiHandler } from "@/lib/api/apiHandler"
-import { AppError } from "@/lib/errors/AppError";
 
 export const GET = apiHandler<"/api/videos/[videoId]/stream">({
-  auth: true
 }, async (ctx) => {
 
   const r2Key = await fetchQuery(api.video.queries.getR2Key, {
     videoId: ctx.params.videoId,
-  }, {
-    token: ctx.session.convexToken
   });
 
 

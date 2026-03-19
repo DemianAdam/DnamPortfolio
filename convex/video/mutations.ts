@@ -1,5 +1,6 @@
+import { zid } from "convex-helpers/server/zod4";
 import { ROLES } from "../user/types/role";
-import {  zUserMutation } from "../zod/zod";
+import { zUserMutation } from "../zod/zod";
 import { createVideoValidator } from "./validators";
 
 export const createVideo = zUserMutation({
@@ -7,6 +8,7 @@ export const createVideo = zUserMutation({
     args: createVideoValidator,
     handler: async (ctx, args) => {
         const { assignedUsers, ...videoData } = args;
+        //console.log(args)
 
         const videoId = await ctx.db.insert("videos", {
             ...videoData,
@@ -24,5 +26,8 @@ export const createVideo = zUserMutation({
                 })
             }
         }
-    }
+
+        return videoId;
+    },
+    //returns: zid("videos")
 });

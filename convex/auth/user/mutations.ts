@@ -4,7 +4,7 @@ import { userValidator } from "../../user/validators";
 import { zid } from "convex-helpers/server/zod4";
 
 export const createUser = adapterMutation({
-  args: { user: userValidator.options[1] },
+  args: { user: userValidator.options[0] },
   handler: async (ctx, { user }) => {
     return await ctx.db.insert("users", user);
   },

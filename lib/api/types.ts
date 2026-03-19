@@ -6,7 +6,7 @@ import { NextRequest } from "next/server"
 import { z } from "zod"
 
 
-type DesktopSession = {
+export type DesktopSession = {
   convexToken: string
   source: "desktop"
 }
@@ -21,9 +21,24 @@ export type ApiOptions<TBody extends z.ZodTypeAny | undefined> = {
   body?: TBody
 }
 
-export type ApiContext<TRoute extends AppRouteHandlerRoutes, TBody extends z.ZodTypeAny | undefined = undefined> = {
+export type SessionFromOptions<TOptions> =
+  TOptions extends { auth: true }
+    ? ApiSession
+    : null
+
+export type ApiContext<
+  TRoute extends AppRouteHandlerRoutes,
+  TOptions extends ApiOptions<z.ZodTypeAny | undefined>
+> = {
   request: NextRequest
-  body: TBody extends z.ZodTypeAny ? z.infer<TBody> : undefined
-  session: ApiSession | null
+
+  body: TOptions extends { body: z.ZodTypeAny }
+    ? z.infer<TOptions["body"]>
+    : undefined
+
+  session: TOptions extends { auth: true }
+    ? ApiSession
+    : null
+
   params: Awaited<RouteContext<TRoute>["params"]>
 }

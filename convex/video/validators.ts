@@ -1,29 +1,27 @@
 import { zid } from "convex-helpers/server/zod4";
 import z from "zod";
-import { simpleUserValidator } from "../user/validators";
+import { simpleUserValidator, userIdValidator } from "../user/validators";
 
 export const videoValidator = z.object({
     title: z.string(),
-    description: z.string(),
-    r2Key: z.string(),
+    description: z.string().optional(),
     duration: z.number(),
     isFree: z.boolean(),
     freeUntil: z.number().optional(),
-    createdBy: zid("users"),
-    date: z.number()
+    createdBy: userIdValidator,
+    publishDate: z.number()
 });
 
 export const createVideoValidator = videoValidator.omit({
     createdBy: true
 }).extend({
-    assignedUsers: z.array(simpleUserValidator).optional()
+    assignedUsers: z.array(simpleUserValidator.pick({ id: true })).optional()
 });
 
 
 export const updateVideoValidator = videoValidator
     .omit({
         createdBy: true,
-        r2Key: true,
         duration: true
     })
     .partial();
@@ -31,7 +29,7 @@ export const updateVideoValidator = videoValidator
 export const videoListItemValidator = videoValidator.pick({
     title: true,
     duration: true,
-    date: true,
+    publishDate: true,
     isFree: true,
     freeUntil: true
 }).extend({
@@ -43,7 +41,7 @@ export const videoDetailsValidator = videoValidator.pick({
     title: true,
     description: true,
     duration: true,
-    date: true,
+    publishDate: true,
     isFree: true,
     freeUntil: true
 }).extend({

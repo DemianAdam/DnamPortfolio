@@ -2,7 +2,7 @@ import { zid } from "convex-helpers/server/zod4";
 import { ROLES } from "../user/types/role";
 import { zUserQuery } from "../zod/zod";
 import { toVideoDetailsDTO, toVideoListItemDTO } from "./mapper";
-import { canUserAccessVideo } from "./utils";
+import { canUserAccessVideo, generateVideoR2Key } from "./utils";
 import { videoDetailsValidator, videoListItemValidator } from "./validators";
 
 import { AppError } from "../../lib/errors/AppError"
@@ -61,8 +61,10 @@ export const getR2Key = zUserQuery({
             throw new AppError(ERROR_CODE.VIDEO.NOT_FOUND, { videoId: args.videoId });
         }
 
+        const r2Key = generateVideoR2Key(video._id);
+
         if (ctx.currentUser.role === ROLES.ADMIN) {
-            return video.r2Key
+            return r2Key;
         }
 
         const canAccess = await canUserAccessVideo(ctx, ctx.currentUser._id, video);
@@ -71,7 +73,7 @@ export const getR2Key = zUserQuery({
             throw new AppError(ERROR_CODE.AUTH.UNAUTHORIZED);
         }
 
-        return video.r2Key;
+        return r2Key;
 
     }
 });
