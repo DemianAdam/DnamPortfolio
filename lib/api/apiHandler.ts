@@ -1,53 +1,56 @@
 import { auth } from "@/auth"
-import { AppError } from "@/lib/errors/AppError"
+import { AppError, mapErrorToResponse } from "@/lib/errors/AppError"
 import { ERROR_CODE } from "@/lib/errors/registry"
 import { parseBody } from "./parseBody"
 import { logApi } from "./logger"
-import { ApiContext, ApiOptions, ApiSession, SessionFromOptions } from "./types"
+import { ApiContext, ApiFailure, ApiHandlerReturn, ApiOptions, ApiResponse, ApiSession, ApiSuccess, SessionFromOptions } from "./types"
 import { NextRequest, NextResponse } from "next/server"
 import { AppRouteHandlerRoutes } from "@/.next/dev/types/routes"
 import z from "zod"
+import { createConvexClient } from "../convex/serverClient"
+import { ErrorDefinition, ErrorCode } from "../errors/types"
+
+
 
 export function apiHandler<
   TRoute extends AppRouteHandlerRoutes,
-  TOptions extends ApiOptions<z.ZodTypeAny | undefined> = ApiOptions<z.ZodTypeAny | undefined>,
-  TResponse = unknown
+  TOptions extends ApiOptions<z.ZodType | undefined>,
+  TResponse = TOptions extends { return: z.ZodType }
+  ? z.output<TOptions["return"]>
+  : undefined
 >(
   options: TOptions,
   handler: (ctx: ApiContext<TRoute, TOptions>) => Promise<TResponse>
-) {
-  return async (
-    request: NextRequest,
-    context: RouteContext<TRoute>
-  ): Promise<NextResponse> => {
+): ApiHandlerReturn<TRoute> {
+
+  return async (request, context) => {
     const start = Date.now()
 
     try {
-
       logApi("api_request", {
         path: request.url,
         method: request.method
       })
 
+      // =========================
       // AUTH
+      // =========================
+
       let session: ApiSession | null = null
 
       if (options.auth) {
-
         const authHeader = request.headers.get("authorization")
 
-        // Desktop app authentication
+        // Desktop
         if (authHeader?.startsWith("Bearer ")) {
-
           const token = authHeader.replace("Bearer ", "")
 
           session = {
             convexToken: token,
             source: "desktop"
           }
-
         }
-        // Browser authentication
+        // Browser
         else {
           session = await auth()
         }
@@ -57,24 +60,33 @@ export function apiHandler<
         }
       }
 
+      // =========================
       // BODY
+      // =========================
 
-
-      let body: unknown
+      let body: unknown = undefined
 
       if (options.body) {
         body = await parseBody(request, options.body)
-      } else {
-        body = undefined
       }
 
       const params = await context.params
 
+      const convex =
+        session && "convexToken" in session
+          ? createConvexClient({ token: session.convexToken })
+          : undefined
+
+      // =========================
+      // EXECUTE HANDLER
+      // =========================
+      
       const result = await handler({
         request,
         body: body as ApiContext<TRoute, TOptions>["body"],
         session: session as SessionFromOptions<TOptions>,
-        params
+        params,
+        convex: convex as ApiContext<TRoute, TOptions>["convex"]
       })
 
       const duration = Date.now() - start
@@ -84,38 +96,37 @@ export function apiHandler<
         duration
       })
 
-      if (result instanceof NextResponse) {
-        return result
+      const response: ApiSuccess<TResponse> = {
+        success: true,
+        data: result
       }
 
-      return NextResponse.json(result)
+      return NextResponse.json(response)
 
     } catch (error) {
 
       const duration = Date.now() - start
 
-      if (error instanceof AppError) {
-
-        logApi("api_error", {
-          code: error.code,
-          duration
-        })
-
-        return NextResponse.json(
-          {
-            code: error.code,
-            meta: error.meta
-          },
-          { status: error.status }
-        )
+      // =========================
+      // KNOWN ERROR
+      // =========================
+      let response: ApiFailure;
+      if (!(error instanceof AppError)) {
+        response = mapErrorToResponse(new AppError(ERROR_CODE.INTERNAL_SERVER_ERROR))
+      }
+      else {
+        response = mapErrorToResponse(error)
       }
 
-      console.error("Unhandled API error:", error)
+      logApi("api_error", {
+        code: response.error.code,
+        duration
+      })
 
-      return NextResponse.json(
-        { code: "INTERNAL_SERVER_ERROR" },
-        { status: 500 }
-      )
+      return NextResponse.json(response, {
+        status: response.error.status
+      })
     }
   }
 }
+

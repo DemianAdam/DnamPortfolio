@@ -3,7 +3,7 @@ import { AppError } from "@/lib/errors/AppError"
 import { ERROR_CODE } from "@/lib/errors/registry"
 import { NextRequest } from "next/server"
 
-export async function parseBody<T extends z.ZodTypeAny>(
+export async function parseBody<T extends z.ZodType>(
   request: NextRequest,
   schema: T
 ): Promise<z.infer<T>> {
