@@ -21,6 +21,7 @@ export function toVideoDetailsDTO(video: Doc<"videos">): VideoDetailsDTO {
         description: video.description,
         duration: video.duration,
         publishDate: video.publishDate,
-        isFree: video.isFree
+        isFree: video.isFree,
+        freeUntil: video.freeUntil
     }
 }

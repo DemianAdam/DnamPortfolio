@@ -3,24 +3,33 @@ import { AppError, mapErrorToResponse } from "@/lib/errors/AppError"
 import { ERROR_CODE } from "@/lib/errors/registry"
 import { parseBody } from "./parseBody"
 import { logApi } from "./logger"
-import { ApiContext, ApiFailure, ApiHandlerReturn, ApiOptions, ApiResponse, ApiSession, ApiSuccess, SessionFromOptions } from "./types"
-import { NextRequest, NextResponse } from "next/server"
+import {
+  ApiContext,
+  ApiFailure,
+  ApiHandlerReturn,
+  ApiOptions,
+  ApiSession,
+  ApiSuccess,
+  SessionFromOptions
+} from "./types"
+import { NextResponse } from "next/server"
 import { AppRouteHandlerRoutes } from "@/.next/dev/types/routes"
 import z from "zod"
 import { createConvexClient } from "../convex/serverClient"
-import { ErrorDefinition, ErrorCode } from "../errors/types"
-
-
 
 export function apiHandler<
   TRoute extends AppRouteHandlerRoutes,
-  TOptions extends ApiOptions<z.ZodType | undefined>,
-  TResponse = TOptions extends { return: z.ZodType }
-  ? z.output<TOptions["return"]>
-  : undefined
+  TOptions extends ApiOptions<z.ZodType | undefined> = ApiOptions<undefined>
 >(
   options: TOptions,
-  handler: (ctx: ApiContext<TRoute, TOptions>) => Promise<TResponse>
+  handler: (
+    ctx: ApiContext<TRoute, TOptions>
+  ) => Promise<
+    | (TOptions extends { return: z.ZodType }
+      ? z.output<TOptions["return"]>
+      : any)
+    | NextResponse
+  >
 ): ApiHandlerReturn<TRoute> {
 
   return async (request, context) => {
@@ -36,12 +45,11 @@ export function apiHandler<
       // AUTH
       // =========================
 
-      let session: ApiSession | null = null
+      let session: ApiSession | null = await auth();
 
       if (options.auth) {
         const authHeader = request.headers.get("authorization")
 
-        // Desktop
         if (authHeader?.startsWith("Bearer ")) {
           const token = authHeader.replace("Bearer ", "")
 
@@ -49,10 +57,6 @@ export function apiHandler<
             convexToken: token,
             source: "desktop"
           }
-        }
-        // Browser
-        else {
-          session = await auth()
         }
 
         if (!session) {
@@ -80,7 +84,7 @@ export function apiHandler<
       // =========================
       // EXECUTE HANDLER
       // =========================
-      
+
       const result = await handler({
         request,
         body: body as ApiContext<TRoute, TOptions>["body"],
@@ -96,25 +100,48 @@ export function apiHandler<
         duration
       })
 
-      const response: ApiSuccess<TResponse> = {
-        success: true,
-        data: result
+      // =========================
+      // VALIDATE RETURN (if schema exists)
+      // =========================
+
+      if ("return" in options && options.return) {
+        const parsed = options.return.parse(result)
+        //handle better parse
+
+        if (result instanceof Response) {
+          return result
+        }
+        const response: ApiSuccess<typeof parsed> = {
+          success: true,
+          data: parsed
+        }
+
+        return NextResponse.json(response)
       }
 
-      return NextResponse.json(response)
+      // =========================
+      // NO SCHEMA → RETURN ANYTHING
+      // =========================
+
+      if (result instanceof NextResponse) {
+        return result
+      }
+      return NextResponse.json({
+        success: true,
+        data: result
+      })
 
     } catch (error) {
 
       const duration = Date.now() - start
 
-      // =========================
-      // KNOWN ERROR
-      // =========================
       let response: ApiFailure;
+
       if (!(error instanceof AppError)) {
-        response = mapErrorToResponse(new AppError(ERROR_CODE.INTERNAL_SERVER_ERROR))
-      }
-      else {
+        response = mapErrorToResponse(
+          new AppError(ERROR_CODE.INTERNAL_SERVER_ERROR)
+        )
+      } else {
         response = mapErrorToResponse(error)
       }
 
@@ -129,4 +156,3 @@ export function apiHandler<
     }
   }
 }
-

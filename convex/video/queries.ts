@@ -61,7 +61,7 @@ export const getR2Key = zUserQuery({
             throw new AppError(ERROR_CODE.VIDEO.NOT_FOUND, { videoId: args.videoId });
         }
 
-        const r2Key = generateVideoR2Key(video._id);
+        const r2Key = generateVideoR2Key(video);
 
         if (ctx.currentUser.role === ROLES.ADMIN) {
             return r2Key;

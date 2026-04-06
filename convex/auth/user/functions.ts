@@ -1,5 +1,3 @@
-import { Doc } from "../../_generated/dataModel";
-import { getAuthUserId } from "@convex-dev/auth/server";
 import { MutationCtx, QueryCtx } from "../../_generated/server";
 import { Role, ROLES } from "../../user/types/role";
 import { AppError } from "../../../lib/errors/AppError";
@@ -37,7 +35,7 @@ async function getUserFromIdentity(identity: UserIdentity, ctx: QueryCtx | Mutat
     const userId = getUserIdFromIdentity(identity);
     const user = await ctx.db.get("users", userId);
     if (!user) {
-        throw new AppError(ERROR_CODE.USER.NOT_FOUND);
+        throw new AppError(ERROR_CODE.USER.NOT_FOUND, { userId });
     }
     console.log("CONVEX USER", user);
     return user;

@@ -2,6 +2,9 @@ import { zid } from "convex-helpers/server/zod4";
 import z from "zod";
 import { simpleUserValidator, userIdValidator } from "../user/validators";
 
+
+const assignedUsersValidator = z.array(simpleUserValidator.pick({ id: true }));
+
 export const videoValidator = z.object({
     title: z.string(),
     description: z.string().optional(),
@@ -9,20 +12,41 @@ export const videoValidator = z.object({
     isFree: z.boolean(),
     freeUntil: z.number().optional(),
     createdBy: userIdValidator,
-    publishDate: z.number()
+    publishDate: z.number(),
+    deleted: z.boolean().default(false),
+    secret: z.string()
 });
 
+
 export const createVideoValidator = videoValidator.omit({
-    createdBy: true
+    createdBy: true,
+    secret: true
 }).extend({
-    assignedUsers: z.array(simpleUserValidator.pick({ id: true })).optional()
+    assignedUsers: assignedUsersValidator.optional()
 });
+
+export const createdVideoValidator = videoValidator
+    .extend({
+        id: zid("videos"),
+        description: z.string().nullable(),
+        freeUntil: z.number().nullable(),
+        assignedUsers: assignedUsersValidator.nullable()
+    })
+
+
+export const deleteVideoValidator = z.object({
+    videoId: zid("videos")
+});
+
+
+
 
 
 export const updateVideoValidator = videoValidator
     .omit({
         createdBy: true,
-        duration: true
+        duration: true,
+        secret: true,
     })
     .partial();
 

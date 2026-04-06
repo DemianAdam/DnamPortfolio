@@ -2,7 +2,8 @@ import { ErrorMap } from "./types"
 
 export const VIDEO_ERROR_CODE = {
   NOT_FOUND: "VIDEO_NOT_FOUND",
-  ACCESS_DENIED: "VIDEO_ACCESS_DENIED"
+  ACCESS_DENIED: "VIDEO_ACCESS_DENIED",
+  ALREADY_DELETED: "VIDEO_ALREADY_DELETED"
 } as const
 
 export type VideoErrorCode =
@@ -38,6 +39,19 @@ export const VIDEO_ERRORS = {
       }
     },
     meta: {} as { videoId: string }
+  },
+  [VIDEO_ERROR_CODE.ALREADY_DELETED]: {
+    status: 400,
+    messages: {
+      en: {
+        title: "Video already deleted",
+        description: "This video has already been deleted"
+      },
+      es: {
+        title: "Video ya eliminado",
+        description: "Este video ya ha sido eliminado"
+      }
+    },
+    meta: {} as { videoId: string }
   }
-
 } as const satisfies ErrorMap<VideoErrorCode>

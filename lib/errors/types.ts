@@ -20,6 +20,7 @@ export type ErrorDefinition<TMeta = unknown> = {
 }
 
 export type ErrorMap<TCodes extends string> = {
+  /* eslint-disable @typescript-eslint/no-explicit-any */
   [K in TCodes]: ErrorDefinition<any>
 }
 

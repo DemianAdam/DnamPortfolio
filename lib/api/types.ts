@@ -1,13 +1,28 @@
-import { AppRouteHandlerRoutes } from "@/.next/dev/types/routes"
-import { Role } from "@/convex/user/types/role"
-
 import { Session } from "next-auth"
 import { NextRequest, NextResponse } from "next/server"
 import { z } from "zod"
 import { ConvexClient } from "../convex/serverClient"
 import { ErrorCode, ErrorDefinition } from "../errors/types"
-import { AppError } from "../errors/AppError"
+import { Role } from "../../convex/user/types/role"
 
+// =========================
+// ROUTE PARAM INFERENCE
+// =========================
+
+export type AppRouteHandlerRoutes = string
+
+type ExtractParams<Path extends string> =
+  Path extends `${string}[${infer Param}]${infer Rest}`
+    ? { [K in Param | keyof ExtractParams<Rest>]: string }
+    : object
+
+export type RouteContext<TRoute extends string> = {
+  params: ExtractParams<TRoute>
+}
+
+// =========================
+// SESSION
+// =========================
 
 export type DesktopSession = {
   convexToken: string
@@ -15,21 +30,32 @@ export type DesktopSession = {
 }
 
 export type ApiSession = DesktopSession | Session
-export type ApiOptions<TBody extends z.ZodType | undefined> = {
-  auth?: false | undefined,
-  body?: TBody,
-  return?: z.ZodType
-} | {
-  auth: true,
-  role?: Role,
-  body?: TBody,
-  return?: z.ZodType
-}
+
+// =========================
+// OPTIONS
+// =========================
+
+export type ApiOptions<TBody extends z.ZodType | undefined> =
+  | {
+      auth?: false | undefined
+      body?: TBody
+      return?: z.ZodType
+    }
+  | {
+      auth: true
+      role?: Role
+      body?: TBody
+      return?: z.ZodType
+    }
 
 export type SessionFromOptions<TOptions> =
   TOptions extends { auth: true }
     ? ApiSession
     : null
+
+// =========================
+// CONTEXT
+// =========================
 
 export type ApiContext<
   TRoute extends AppRouteHandlerRoutes,
@@ -45,8 +71,11 @@ export type ApiContext<
     ? ApiSession
     : null
 
-  params: Awaited<RouteContext<TRoute>["params"]>
-  convex: TOptions["auth"] extends true ? ConvexClient : never;
+  params: RouteContext<TRoute>["params"]
+
+  convex: TOptions extends { auth: true }
+    ? ConvexClient
+    : never
 }
 
 // =========================
@@ -72,4 +101,7 @@ export type ApiResponse<T> = ApiSuccess<T> | ApiFailure
 // =========================
 
 export type ApiHandlerReturn<TRoute extends AppRouteHandlerRoutes> =
-  (request: NextRequest, context: RouteContext<TRoute>) => Promise<NextResponse>
+  (
+    request: NextRequest,
+    context: RouteContext<TRoute>
+  ) => Promise<NextResponse>

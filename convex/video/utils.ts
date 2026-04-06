@@ -23,6 +23,6 @@ export async function canUserAccessVideo(ctx: QueryCtx, userId: Id<"users">, vid
     return false;
 }
 
-export async function generateVideoR2Key(videoId: Id<"videos">) {
-    return `videos/${videoId}/playlist.m3u8`;
+export async function generateVideoR2Key(video: Doc<"videos">) {
+    return `videos/${video._id}-${video.secret}/playlist.m3u8`;
 }

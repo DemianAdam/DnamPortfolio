@@ -2,6 +2,8 @@ import { defineConfig, globalIgnores } from "eslint/config";
 import nextVitals from "eslint-config-next/core-web-vitals";
 import nextTs from "eslint-config-next/typescript";
 
+import requireApiHandler from "./eslint-rules/require-apihandler.mjs";
+
 const eslintConfig = defineConfig([
   ...nextVitals,
   ...nextTs,
@@ -23,17 +25,51 @@ const eslintConfig = defineConfig([
       ],
     },
     linterOptions: {
-      reportUnusedDisableDirectives: false
-    }
-  },
-  {
-    files: ["convex/auth/adapter.ts","convex/zod/zod.ts"],
-    rules: {
-      "no-restricted-imports": "off"
-    }
+      reportUnusedDisableDirectives: false,
+    },
   },
 
-  // Override default ignores of eslint-config-next.
+  // ✅ API route rules
+  {
+    files: ["app/api/**/*.{ts,tsx}"],
+
+    // ✅ Flat config plugin definition (ESM-safe)
+    plugins: {
+      local: {
+        rules: {
+          "require-apihandler": requireApiHandler,
+        },
+      },
+    },
+
+    rules: {
+      // 🚫 Ban fetchQuery
+      "no-restricted-imports": [
+        "error",
+        {
+          paths: [
+            {
+              name: "convex/nextjs",
+              importNames: ["fetchQuery"],
+              message:
+                "Do not use fetchQuery in API routes. Use ctx.convex.query via apiHandler.",
+            },
+          ],
+        },
+      ],
+
+      // ✅ Enforce apiHandler usage
+      "local/require-apihandler": "error",
+    },
+  },
+
+  {
+    files: ["convex/auth/adapter.ts", "convex/zod/zod.ts"],
+    rules: {
+      "no-restricted-imports": "off",
+    },
+  },
+
   globalIgnores([
     ".next/**",
     "out/**",

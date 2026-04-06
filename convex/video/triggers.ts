@@ -1,18 +1,31 @@
+import { AppError } from "../../lib/errors/AppError";
+import { ERROR_CODE } from "../../lib/errors/registry";
 import { COUNTER_KEYS, getCounter } from "../counter";
-import { InsertOperation, subscribeTrigger, DeleteOperation } from "../triggers";
+import { subscribeTrigger } from "../triggers";
+
 const counter = getCounter(COUNTER_KEYS.totalVideos);
 
-const onInsertVideo: InsertOperation = async (ctx) => {
-    counter.inc(ctx);
-}
-
-const onDeleteVideo: DeleteOperation = async (ctx) => {
-    counter.dec(ctx);
-}
-
-
 subscribeTrigger("videos", {
-    insert: onInsertVideo,
-    delete: onDeleteVideo,
-    /*onUpdate: onUpdateVideo*/
+    insert: async (ctx) => {
+        counter.inc(ctx);
+    },
+
+    delete: async (ctx, { oldDoc }) => {
+        console.log("VIDEO DELETED TRIGGER")
+        if (oldDoc.deleted) {
+            throw new AppError(ERROR_CODE.VIDEO.ALREADY_DELETED, {
+                videoId: oldDoc._id,
+            });
+        }
+
+        counter.dec(ctx);
+    },
+
+    update: async (_, { oldDoc }) => {
+        if (oldDoc.deleted) {
+            throw new AppError(ERROR_CODE.VIDEO.ALREADY_DELETED, {
+                videoId: oldDoc._id,
+            });
+        }
+    },
 });

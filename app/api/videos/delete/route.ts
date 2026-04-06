@@ -1,15 +1,14 @@
-import { r2Client } from "@/lib/r2/r2Client";
-import { DeleteObjectCommand } from "@aws-sdk/client-s3";
+import { api } from "@/convex/_generated/api";
+import { ROLES } from "@/convex/user/types/role";
+import { deleteVideoValidator } from "@/convex/video/validators";
+import { apiHandler } from "@/lib/api/apiHandler";
 
-export async function POST(req: Request) {
-  const { r2Key } = await req.json();
-
-  await r2Client.send(
-    new DeleteObjectCommand({
-      Bucket: process.env.R2_BUCKET_NAME!,
-      Key: r2Key,
-    })
-  );
-
-  return new Response("ok");
-}
+export const POST = apiHandler({
+  auth: true,
+  role: ROLES.ADMIN,
+  body: deleteVideoValidator,
+}, async (ctx) => {
+  await ctx.convex.mutation(api.video.mutations.deleteVideo, {
+    videoId: ctx.body.videoId
+  });
+});
